@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micro NT Quiz - PCEM3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&display=swap');
+        body { font-family: 'ui-sans-serif', system-ui, 'Kantumruy Pro', sans-serif; }
+        
+        .option-correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            animation: pulse-green 0.4s ease-out;
+        }
+        .option-incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes pulse-green {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+        .disabled-labels { pointer-events: none; opacity: 0.8; }
+        .redo-btn {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .redo-btn:hover { background-color: #e5e7eb; color: #1f2937; }
+        .sticky-nav { position: sticky; top: 0; z-index: 50; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(8px); }
+        .khmer-text { font-family: 'Kantumruy Pro', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 py-10 px-4">
+
+    <div class="max-w-5xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200">
+        <!-- Header -->
+        <div class="bg-slate-800 p-8 text-white text-center">
+            <h1 class="text-4xl font-bold mb-2">QCM PCEM3 Micro NT</h1>
+            <p class="text-xl khmer-text text-slate-300">មេរោគសាស្ត្រ និង បារ៉ាស៊ីតសាស្ត្រ</p>
+        </div>
+
+        <!-- Sticky Nav -->
+        <div class="sticky-nav text-white p-3 overflow-x-auto whitespace-nowrap flex gap-4 text-[10px] font-bold uppercase tracking-widest scrollbar-hide border-b border-slate-700">
+            <a href="#sec-leish" class="hover:text-blue-400 px-3">Leishmaniasis</a>
+            <a href="#sec-malaria" class="hover:text-blue-400 px-3">Malaria</a>
+            <a href="#sec-toxo" class="hover:text-blue-400 px-3">Toxoplasmosis</a>
+            <a href="#sec-candida" class="hover:text-blue-400 px-3">Candida</a>
+            <a href="#sec-derm" class="hover:text-blue-400 px-3">Dermatophytosis</a>
+            <a href="#sec-histo" class="hover:text-blue-400 px-3">Histoplasmosis</a>
+            <a href="#sec-asper" class="hover:text-blue-400 px-3">Aspergillosis</a>
+            <a href="#sec-crypto" class="hover:text-blue-400 px-3">Cryptococcosis</a>
+            <a href="#sec-onycho" class="hover:text-blue-400 px-3">Onychomycosis</a>
+        </div>
+
+        <div class="p-6 md:p-10">
+            <div id="quiz-container" class="space-y-20">
+                <!-- Sections Injected by JavaScript -->
+            </div>
+
+            <!-- Scoring Section -->
+            <div id="final-result" class="hidden mt-20 p-10 bg-slate-900 text-white rounded-3xl text-center">
+                <h2 class="text-3xl font-bold mb-4 khmer-text">លទ្ធផលសរុប (Total Score)</h2>
+                <div class="text-7xl font-black mb-4 text-emerald-400"><span id="total-score">0</span> / <span id="max-score">0</span></div>
+                <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="text-blue-400 underline font-bold">Review Answers</button>
+            </div>
+
+            <div class="mt-16 flex justify-center">
+                <button onclick="calculateScore()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-6 px-20 rounded-full shadow-2xl transform transition active:scale-95 text-2xl khmer-text">
+                    ពិនិត្យពិន្ទុសរុប (Calculate Final Score)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                id: "leish",
+                title: "Leishmaniasis (Q1-19)",
+                questions: [
+                    { n: 1, q: "Leishmaniasis is a disease caused by:", o: ["Trichophyton genus", "Microsporum", "Toxoplasma gondii", "Others"], a: "D" },
+                    { n: 2, q: "Leishmaniasis occurs in:", o: ["80 tropical and subtropical countries.", "88 tropical and subtropical countries.", "80 tropical and countries.", "88 subtropical countries.", "Others"], a: "B" },
+                    { n: 3, q: "Leishmaniasis caused about:", o: ["52,000 deaths in 2010.", "87,000 deaths in 1990.", "1.5–2.0 million new cases each year.", "A+B", "A+B+C"], a: "E" },
+                    { n: 4, q: "Leishmaniasis is caused by :", o: ["Mosquitoes", "flies", "Sand flies", "Parasite", "Others"], a: "C" },
+                    { n: 5, q: "Risk factors of Leishmaniasis include:", o: ["Deforestation", "Malnutrition", "Urbanization", "Poverty", "A+B+C+D"], a: "E" },
+                    { n: 6, q: "Risk factors of Leishmaniasis is:", o: ["Immunocompetent", "Old men", "Diabetic", "Poverty", "A+B+C+D"], a: "D" },
+                    { n: 7, q: "Infections of Leishmaniasis in humans are caused by :", o: ["More than 20 species of Leishmania.", "Less than 20 species of Leishmania.", "20 species of Leishmania.", "1 specie of Leishmania.", "Others"], a: "A" },
+                    { n: 8, q: "An infective stage the sand flies inject:", o: ["Amastigotes", "Metacyclic promastigotes", "Macrophages infected with amastigotes", "Multiply and migrate to the proboscis.", "Others"], a: "B" },
+                    { n: 9, q: "The components of Leishmaniasis saliva include the factors of :", o: ["Vasodilatory", "Anticlotting", "Inhibit wound healing", "Anestesic", "A+B+C"], a: "E" },
+                    { n: 10, q: "Symptoms of cutaneous leishmaniasis include:", o: ["Diarrhea", "Stuffy nose", "Swallowing difficulty", "A+B", "B+C"], a: "E" },
+                    { n: 11, q: "Symptoms of visceral infection in children include:", o: ["Diarrhea", "Runny nose", "Swallowing difficulty", "Skin ulcer", "Others"], a: "A" },
+                    { n: 12, q: "All of them are the true answers only one is the false answer. Find the false answer: Symptoms of cutaneous leishmaniasis include:", o: ["Swallowing difficulty", "Ulcers in the mouth.", "Stomach ulcer", "Skin ulcer", "Inner nose ulcer"], a: "C" },
+                    { n: 13, q: "Other symptoms of systemic visceral Leishmaniasis may include:", o: ["Thinning hair", "Weight loss", "Abdominal discomfort", "A+B+C"], a: "D" },
+                    { n: 14, q: "Leishmaniasis is diagnosed by:", o: ["Liquid cerebrospinal examination", "Microscopic examination of the stool", "Blood culture", "Biopsy of the spleen, skin , liver and culture", "Others"], a: "D" },
+                    { n: 15, q: "Treatment of Leishmaniasis:", o: ["Pentamidine", "Paromomycin", "Rifampicine", "A+B", "A+B+C"], a: "D" },
+                    { n: 16, q: "Complications of Leishmaniasis include:", o: ["Disfigurement of the face", "Deadly infections due to immune system damage", "Bleeding (hemorrhage)", "A+B+C", "Others"], a: "D" },
+                    { n: 17, q: "Prognosis of Leishmaniasis include:", o: ["Cure rates are high with the proper medicine", "Patients should get treated before damage", "Death is usually caused by complications (such as other infections)", "A+B", "A+B+C"], a: "E" },
+                    { n: 18, q: "Plastic surgery for the treatment of Leishmaniasis may be needed to correct the disfigurement caused:", o: ["Disfigurement of the face.", "Disfigurement of the abdomen.", "Disfigurement of the hand.", "Disfigurement of the foot.", "A+B+C+D"], a: "A" },
+                    { n: 19, q: "Prevention of Leishmaniasis include:", o: ["Vaccination", "Opening windows", "Preventing sand fly bites", "Chemotherapy", "Others"], a: "C" }
+                ]
+            },
+            {
+                id: "malaria",
+                title: "Malaria (Q12-21)",
+                questions: [
+                    { n: 12, q: "Malaria is an infectious disease caused by a parasite namely:", o: ["Plasmodium", "Toxoplasma gondii", "Histoplasma", "Candida albican", "Leishmania"], a: "A" },
+                    { n: 13, q: "Malaria parasites infect humans caused by:", o: ["2 species", "3 species", "4 species", "5 species"], a: "D" },
+                    { n: 14, q: "The most prevalent malaria parasite on the Africa and Asia and responsible for most malaria-related deaths globally is:", o: ["Plasmodium vivax", "Plasmodium falciparum", "Plasmodium malariae", "Plasmodium knowlesi"], a: "B" },
+                    { n: 15, q: "In most cases, malaria is transmitted through the:", o: ["Water and food", "Sexuality", "Bites of female Anopheles mosquitoes", "Stool"], a: "C" },
+                    { n: 16, q: "Risk factors for malaria transmission include:", o: ["Using bet net in high transmission area", "Live or work in the forest", "New settlers in non transmission area", "A+B+C"], a: "D" },
+                    { n: 17, q: "Incubation period of malaria from:", o: ["2 days to 1 weeks after infection", "7 days to 2 weeks after infection", "20 days to 6 weeks after infection", "10 days to 4 weeks after infection"], a: "D" },
+                    { n: 18, q: "Main symptom of simple malaria include:", o: ["Prostration", "Circulatory collapse", "Pulmonary oedema", "Fever, Chills, Sweating"], a: "D" },
+                    { n: 19, q: "Symptom severe or complicated malaria include:", o: ["Enlarged spleen or liver", "Loss of appetite", "Nausea", "Respiratory distress"], a: "D" },
+                    { n: 20, q: "Malaria is diagnosed by:", o: ["Blood examination", "Stool examination", "Biopsy examination", "A+B+C"], a: "A" },
+                    { n: 21, q: "Prevention of malaria include:", o: ["Chemotherapy", "Sexuality prevention", "Water and food safety", "Insecticide-treated mosquito nets"], a: "D" }
+                ]
+            },
+            {
+                id: "toxo",
+                title: "Toxoplasmosis (Q22-29)",
+                questions: [
+                    { n: 22, q: "The causes toxoplasmosis is found in human infection may result from:", o: ["Blood transfusions", "Bites of sand fly", "Eating good cooked meat (lamb, pork, and beef )", "A+B+C"], a: "A" },
+                    { n: 23, q: "Toxoplasmosis can be transmitted to humans by:", o: ["2 principal routes", "3 principal routes", "4 principal routes", "5 principal routes"], a: "B" },
+                    { n: 24, q: "Toxoplasmosis can be transmitted to humans by:", o: ["Ingestion of raw or adequately cooked infected meat", "Washed fruits or vegetables", "Infected pregnant woman passing the infection to her unborn fetus", "A+B+C"], a: "D" },
+                    { n: 25, q: "Risk factors for infection of toxoplasmosis include:", o: ["Persons with immune-competent systems", "Those taking certain types of chemoprophylaxis", "Those who have recently received an organ transplant", "A+B+C"], a: "C" },
+                    { n: 26, q: "Symptoms of Toxoplasmosis include:", o: ["Weight loss", "Diarrhea", "Poor coordination", "A+B+C"], a: "C" },
+                    { n: 27, q: "Toxoplasmosis is diagnosed by:", o: ["Biological", "Serological", "Culture", "A+B"], a: "D" },
+                    { n: 28, q: "Complications of Toxoplasmosis include:", o: ["Relapse", "Death( weak immune system)", "Reinfection", "A+B"], a: "D" },
+                    { n: 29, q: "Prevention of Toxoplasmosis include:", o: ["Eat undercooked meat", "Wash hands before handling raw meat", "Wash your hands thoroughly after touching soil that may be contaminated with animal feces", "Keep children's play areas from cat and dog feces"], a: "C" }
+                ]
+            },
+            {
+                id: "candida",
+                title: "Candida (Q30-44)",
+                questions: [
+                    { n: 30, q: "Causes of candida parapsilosis include:", o: ["Patients with neutropenia", "Endocarditis", "Meningitis", "Others"], a: "D" },
+                    { n: 31, q: "Candida tropicalis has been implicated in infections of:", o: ["Patients with neutropenia", "Endocarditis", "Meningitis", "Others"], a: "A" },
+                    { n: 32, q: "Portals of entry for Candida include:", o: ["Gastro intestinal tract", "Air borne route", "Sex", "Urinary tract"], a: "A" },
+                    { n: 33, q: "Causes of oral candidiasis include:", o: ["Chemotherapy for cancer", "Wear rubber gloves", "Hands that are exposed to moisture", "Birth control pills"], a: "A" },
+                    { n: 34, q: "Causes of Cutaneous candidiasis include:", o: ["Chemotherapy for cancer", "Hands that are exposed to moisture", "Ventilation tubing,", "Surgical wounds."], a: "B" },
+                    { n: 35, q: "Reservoir of Candida in human include:", o: ["Vagina", "Pharynx", "Gastrointestinal tract", "A+B+C"], a: "D" },
+                    { n: 36, q: "Risk factors of candida include:", o: ["Immuno compromise", "Gastrointestinal (GI) tract surgery", "Hypertention", "A+B"], a: "D" },
+                    { n: 37, q: "Symptom of trust candidiasis include:", o: ["Swallowing difficult", "Chest pain", "Weepy skin", "White patches inside the mouth"], a: "D" },
+                    { n: 38, q: "Symptom of Esophagitis candidiasis include:", o: ["Small pustules nearby", "Swallowing difficult", "Chest pain", "B+C"], a: "D" },
+                    { n: 39, q: "Symptom of cutaneous candidiasis include:", o: ["Patches of red", "Moist", "Weepy skin", "A+B+C"], a: "D" },
+                    { n: 40, q: "Symptom of Vaginal yeast infections include:", o: ["Pain or discomfort during sexual intercourse", "Weepy skin", "Patches of red", "A+B+C"], a: "A" },
+                    { n: 41, q: "Candidiasis is diagnosed by:", o: ["Microscopic examination can identify the characteristic form of yeast:", "Tissue biopsy", "Blood cultures", "A+B+C"], a: "D" },
+                    { n: 42, q: "Prognosis of vaginal candidiasis are:", o: ["Candida develops resistance to one drug", "Cured reliably", "These infections can recur", "B+C"], a: "D" },
+                    { n: 43, q: "What is the site of infection when candidia spreads to the bloodstream ,it may cause a wide range of symptoms, from unexplained fever to shock and multiple organ failure is:", o: ["Esophagitis", "Thrush", "Cutaneous candidiasis", "Deep candidiasis"], a: "D" },
+                    { n: 44, q: "Prevention of candidiasis include:", o: ["Good hygiene, proper nutrition, and careful antibiotic use", "Patients should be sure that catheters are improperly maintained and used for the longest possible time length.", "Good vaginal hygiene and good oral hygiene might reduce problems, but they are guarantees against candidiasis.", "A+B+C"], a: "A" }
+                ]
+            },
+            {
+                id: "derm",
+                title: "Dermatophytosis (Q45-65)",
+                questions: [
+                    { n: 45, q: "Dermatophytosis (also known as ringworm or tinea) is an infection of the hair, skin, or nails caused by a dermatophyte, which is most commonly of the:", o: ["Epidermophyton genera", "Trichophyton genus", "Microsporum", "Others"], a: "B" },
+                    { n: 46, q: "Dermatophytes is a group of fungi that invade and grow in:", o: ["Dead keratin", "Cell", "Liver", "Lung"], a: "A" },
+                    { n: 47, q: "According to their normal habitat dermatophytes are classified as anthropophilic for:", o: ["Human", "Animal", "Soil", "Others"], a: "A" },
+                    { n: 48, q: "According to their normal habitat dermatophytes are classified as zoophilic for:", o: ["Human", "Soil", "Animal", "Others"], a: "C" },
+                    { n: 49, q: "According to their normal habitat dermatophytes are classified as geophilic for:", o: ["Animal", "Human", "Soil", "Others"], a: "C" },
+                    { n: 50, q: "Anthropophilic dermatophytes are restricted to human hosts and produce a:", o: ["Mild and simple inflammation", "Mild and acute inflammation", "Mild and chronic inflammation", "Others"], a: "C" },
+                    { n: 51, q: "Transmission of dermatophytosis include:", o: ["Directly", "Indirectly", "A+B", "Others"], a: "C" },
+                    { n: 52, q: "Clinical classification of dermatophytosis is according to site:", o: ["Scalp - Tinea pedis", "Feet - Tinea capitis..", "Hands - Tinea manuum.", "Others"], a: "C" },
+                    { n: 53, q: "Tinea pedis particularly affects the:", o: ["Hairs", "Foot", "Nail", "Skin"], a: "B" },
+                    { n: 54, q: "Tinea capitis particularly affects the:", o: ["Hairs", "Foot", "Nail", "Skin"], a: "A" },
+                    { n: 55, q: "Tinea unguium particularly affects the:", o: ["Hairs", "Foot", "Nail", "Skin"], a: "C" },
+                    { n: 56, q: "Tinea corporis particularly affects the:", o: ["Hairs", "Foot", "Nail", "Skin"], a: "D" },
+                    { n: 57, q: "The clinical manifestations of tinea pedis:", o: ["It commonly affects the plantar surface of the foot. Erythema, vesicles and pustules can occur", "It particularly affects the web of the toe where skin may be macerated and erythematous", "It can cause hair loss with broken hairs at the surface (as distinct from alopecia areata)", "A+B"], a: "D" },
+                    { n: 58, q: "The clinical manifestations of tinea tinea unguium (onychomycosis):", o: ["It can cause hair loss with broken hairs at the surface (as distinct from alopecia areata)", "Skin lesions have annular scaly plaques with raised edges", "Typically lesions are on exposed skin of the trunk, arms and legs", "Nail dystrophy with thickening and discoloration of the nail develops."], a: "D" },
+                    { n: 59, q: "The clinical manifestations of tinea tinea capitis is:", o: ["Skin lesions have annular scaly plaques with raised edges", "It can cause hair loss with broken hairs at the surface (as distinct from alopecia areata)", "Nail dystrophy with thickening and discoloration of the nail develops.", "Typically lesions are on exposed skin of the trunk, arms and legs"], a: "B" },
+                    { n: 60, q: "The clinical manifestations of tinea tinea corporis is:", o: ["Skin lesions have annular scaly plaques with raised edges", "There may be vesicles and pustules", "Typically lesions are on exposed skin of the trunk, arms and legs", "A+B+C"], a: "D" },
+                    { n: 61, q: "The clinical manifestation of tinea barbae is:", o: ["Typically lesions are on exposed skin of the trunk, arms and legs", "Skin lesions have annular scaly plaques with raised edges", "Affects the beard area (Redness, scaling and pustules are common)", "It can cause hair loss with broken hairs at the surface (as distinct from alopecia areata)"], a: "C" },
+                    { n: 62, q: "Symptom of dermatophytosis include:", o: ["Weight loss", "Circular area of hair loss (alopecia)", "Diarrhea", "A+B+C"], a: "B" },
+                    { n: 63, q: "Dermatophytosis is diagnosed by:", o: ["Culture of the affected area", "Wood's light examination", "Microscopic examination of the stool.", "A+B"], a: "D" },
+                    { n: 64, q: "The main complication of dermatophytosis is:", o: ["Pain and difficulty with shoes", "Respiratory failure", "Pneumothorax", "Lead to other serious infections eg. cellulites"], a: "D" },
+                    { n: 65, q: "Prevention of dermatophytosis include:", o: ["Avoid public swimming pools", "keep your nails clean and trimmed", "Keep your feet dry", "Avoiding prolonged wetting or dampness of the skin and feet"], a: "D" }
+                ]
+            },
+            {
+                id: "histo",
+                title: "Histoplasmosis (Q66-76)",
+                questions: [
+                    { n: 66, q: "Histoplasmosis is an infection caused by a fungus called:", o: ["Leishmania", "Toxoplasma gondii", "Dermatophyte", "Others"], a: "D" },
+                    { n: 67, q: "The fungus of histoplasmosis lives in:", o: ["Water", "Soil", "Animal", "Human"], a: "B" },
+                    { n: 68, q: "Transmission of histoplasmosis:", o: ["Transmission from person to person", "Inhalation of spores from soil (often soil contaminated with bat or bird droppings)", "Directly (through contact with infected lesions).", "Warm weather and tight clothing"], a: "B" },
+                    { n: 69, q: "Incubation period of histoplasmosis, after a person breathes in the fungal spores:", o: ["Between 1 and 7 days", "Between 3 and 17 days", "Between 3 and 10 days", "Between 5 and 15 days"], a: "B" },
+                    { n: 70, q: "Risk factors of histoplasmosis:", o: ["Construction workers", "Landscapers and gardeners", "Roofers", "A+B+C"], a: "D" },
+                    { n: 71, q: "Most at risk of severe infection for histoplasmosis:", o: ["Corticosteroid drugs, such as prednisone", "Intensive cancer chemotherapy", "Landscapers and gardeners", "A+B"], a: "D" },
+                    { n: 72, q: "Symptoms of histoplasmosis include:", o: ["Headache", "Diarrhea", "Vomiting", "Weight loss"], a: "A" },
+                    { n: 73, q: "Histoplasmosis is diagnosed by:", o: ["Biopsy of the lung, skin, liver, or bone marrow", "Culture of the lung, skin, liver, or bone marrow", "Cultures of the blood, urine, or sputum", "A+C"], a: "D" },
+                    { n: 74, q: "Complications of Histoplasmosis:", o: ["Acute respiratory distress syndrome (ARDS)", "Lung problems", "Encephalitis", "A+B+C"], a: "D" },
+                    { n: 75, q: "Prognosis of histoplasmosis depends on:", o: ["General health condition", "Weakened immune system", "Some people get better without treatment", "A+B+C"], a: "D" },
+                    { n: 76, q: "Prevention of histoplasmosis:", o: ["Wearing clean, loose-fitting underwear", "Wash hands after handling raw meat", "Wearing protective clothing", "Others"], a: "C" }
+                ]
+            },
+            {
+                id: "asper",
+                title: "Aspergillosis (Q77-87)",
+                questions: [
+                    { n: 77, q: "Aspergillosis is infection, usually of the lungs, caused by the:", o: ["Leishmania", "Histoplasma", "Plasodium", "Others"], a: "D" },
+                    { n: 78, q: "Allergic pulmonary aspergillosis is an allergic reaction to the fungus. This infection usually develops in people who have:", o: ["Weakened immune system", "Lung abscess", "Lung problems such as asthma", "Tuberculosis"], a: "C" },
+                    { n: 79, q: "Aspergilloma is develops in an area of past lung disease or lung scarring such as:", o: ["Weakened immune system", "Tuberculosis", "Lung problems such as asthma", "A+B+C"], a: "B" },
+                    { n: 80, q: "Invasive pulmonary aspergillosis is a serious infection occurs most often in people with:", o: ["Weakened immune system", "Lung problems such as asthma", "Tuberculosis", "Lung abscess"], a: "A" },
+                    { n: 81, q: "Transmission of aspergillosis include:", o: ["Water", "Swimming pools", "Ingestion of conidia (spores)", "Inhalation of conidia (spores)"], a: "D" },
+                    { n: 82, q: "Risk factors of aspergillosis include:", o: ["Tuberculosis", "Meningitis", "Healthy immune system", "Malaria"], a: "A" },
+                    { n: 83, q: "Symptom of pulmonary aspergillosis may include:", o: ["Weight loss", "Cough", "Fever", "A+B+C"], a: "D" },
+                    { n: 84, q: "Diagnosis Aspergillus infection based on:", o: ["Symptoms", "Physical examinations", "Lung function tests", "A+B+C"], a: "D" },
+                    { n: 85, q: "Complications of aspergillosis include:", o: ["Massive bleeding from the lung", "Permanent airway blockage", "Heart problems", "A+B"], a: "D" },
+                    { n: 86, q: "Prognosis of aspergillosis include:", o: ["Allergic aspergillosis usually does not get better over time", "Invasive aspergillosis does not get better with drug treatment, it eventually leads to death.", "Invasive aspergillosis not depends on immune system health", "A+B+C"], a: "B" },
+                    { n: 87, q: "Prevention of aspergillosis include:", o: ["It's nearly possible to avoid exposure to aspergillus", "To be expose to airborne infectious agents", "If you have had a transplant or are undergoing chemotherapy, try to stay away from the most obvious sources of mold, such as construction sites, compost piles ect……", "A+B+C"], a: "C" }
+                ]
+            },
+            {
+                id: "crypto",
+                title: "Cryptococcosis (Q88-98)",
+                questions: [
+                    { n: 88, q: "Cryptococcosis is an infectious disease that is caused by a fungus:", o: ["Cryptococcus neoformans", "Cryptococcosis gattii", "Trichophyton rubrum", "A+B", "A+B+C"], a: "D" },
+                    { n: 89, q: "There are more than: 30 species of Cryptococcus,", o: ["10 species of Cryptococcus,", "20 species of Cryptococcus,", "25 species of Cryptococcus,", "35 species of Cryptococcus,", "Others"], a: "D" },
+                    { n: 90, q: "Risk factors the infection of Cryptococcosis:", o: ["Bird dropping", "Haematological malignancies", "Infant", "A+B", "A+B+C"], a: "D" },
+                    { n: 91, q: "Transmission of Cryptococcosis include:", o: ["Spread directly from person to person", "Spread between animals and people", "Spread between soil and people", "Inhalation the fungus from the environment", "Others"], a: "D" },
+                    { n: 92, q: "Symptoms of cryptococcosis in some people has lung infection:", o: ["Difficulty breathing", "Cough", "Confusion", "A+B", "A+B+C"], a: "D" },
+                    { n: 93, q: "Symptoms of cryptococcosis in some people has meningitis infection:", o: ["Blurred vision", "Headache", "Confusion", "A+B", "A+B+C"], a: "E" },
+                    { n: 94, q: "Symptoms of cryptococcosis in some people has skin infection:", o: ["Consisting of bumps", "Confusion", "Difficulty breathing", "Headache", "A+B+C+D"], a: "A" },
+                    { n: 95, q: "The diagnosis of cryptococcosis is based on:", o: ["Examination of tissue and fluid samples", "Urine and sputum: cultures", "CT scan", "A+B", "A+B+C"], a: "E" },
+                    { n: 96, q: "Complications of cryptococcosis is based on:", o: ["Bronchitis", "Permanent neurologic damage", "Septicemia", "A+B", "A+B+C"], a: "D" },
+                    { n: 97, q: "Prognosis of cryptococcosis: With early diagnosis and treatment, most people with cryptococcosis will have a:", o: ["Bad prognosis because the infection will be spreaded.", "Good prognosis because the infection will be stopped.", "Mortality rate as high as 30%.", "A+B", "B+C"], a: "E" },
+                    { n: 98, q: "Prevention of cryptococcosis:", o: ["Vaccination", "Large accumulations of bird droppings should be conserved.", "Not use antibiotics to prevent repeat infections.", "Large accumulations of bird droppings should be removed after first being wetted.", "A+B+C+D"], a: "D" }
+                ]
+            },
+            {
+                id: "onycho",
+                title: "Onychomycosis (Q99-107)",
+                questions: [
+                    { n: 99, q: "Onychomycosis is fungal infection of the:", o: ["Hand", "Nail plate, nail bed", "Lung", "Liver", "Others"], a: "B" },
+                    { n: 100, q: "The responsible agents for nail infection is/are:", o: ["Fungi,", "Yeasts, and molds", "Molds", "A+B", "A+B+C"], a: "E" },
+                    { n: 101, q: "Onychomycosis is caused by:", o: ["1 main classes of fungi", "2 main classes of fungi", "4 main classes of fungi", "5 main classes of fungi", "Others"], a: "E" },
+                    { n: 102, q: "The most common cause of onychomycosis is/are:", o: ["Dermatophytes", "Candida albican", "Toxoplasma gondii", "Epidermophyton genera", "Others"], a: "A" },
+                    { n: 103, q: "Risk factors for onychomycosis (toenail fungus) is/are:", o: ["Prior trauma", "Participation in fitness activities", "Warm climate", "B+C", "A+B+C"], a: "E" },
+                    { n: 104, q: "Diagnosis of onychomycosis based on:", o: ["Physical examination", "Patients’ history", "Microscopy and culture of nail specimens", "Biopsy", "A+B+C"], a: "E" },
+                    { n: 105, q: "Differential diagnosis of onychomycosis include:", o: ["Psoriasis.", "Normal aging.", "Yellow nail syndrome", "Chronic paronychia.", "A+B+C+D"], a: "E" },
+                    { n: 106, q: "Complications of onychomycosis is/are:", o: ["Lead to other serious infections eg. cellulites", "A severe case of nail fungus can be painful and may cause permanent damage to your nails.", "Distorted in shape", "A+B", "A+B+C"], a: "E" },
+                    { n: 107, q: "Prevention of onychomycosis based on:", o: ["Keep your feet wet.", "Use public swimming pools", "Share personal belongings such as socks, slippers, or shoes especially with people known to have onychomycosis", "keep your nails clean and trimmed", "Others"], a: "D" }
+                ]
+            }
+        ];
+
+        let audioCtx = null;
+        function playTone(freq, type, duration) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const playCorrect = () => playTone(880, 'sine', 0.2);
+        const playWrong = () => playTone(220, 'square', 0.2);
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            let globalQIndex = 0;
+
+            quizData.forEach(section => {
+                const sectionHtml = `
+                    <div id="sec-${section.id}" class="space-y-8">
+                        <div class="flex justify-between items-center border-b-4 border-slate-200 pb-3">
+                            <h2 class="text-2xl font-black text-slate-800 uppercase">${section.title}</h2>
+                            <button onclick="resetSection('${section.id}')" class="redo-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                Redo Section
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 gap-6">
+                            ${section.questions.map((q, qIdx) => {
+                                globalQIndex++;
+                                return `
+                                    <div class="bg-white p-6 border-l-8 border-slate-400 rounded-2xl shadow-md hover:shadow-lg transition-shadow q-block" data-section="${section.id}" data-correct="${q.a}">
+                                        <p class="font-bold text-lg mb-4 text-gray-800">Question ${q.n}: ${q.q}</p>
+                                        <div class="grid grid-cols-1 gap-3 options-grid">
+                                            ${q.o.map((opt, oIdx) => {
+                                                const letter = String.fromCharCode(65 + oIdx);
+                                                return `
+                                                    <label class="flex items-center p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:bg-slate-50 transition-all relative">
+                                                        <input type="radio" name="sec${section.id}-q${qIdx}" value="${letter}" class="hidden" onchange="checkAnswer(this)">
+                                                        <span class="font-bold text-slate-600 mr-3">${letter})-</span>
+                                                        <span class="text-gray-700">${opt}</span>
+                                                    </label>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', sectionHtml);
+            });
+            document.getElementById('max-score').textContent = globalQIndex;
+        }
+
+        function checkAnswer(input) {
+            const block = input.closest('.q-block');
+            const grid = input.closest('.options-grid');
+            const labels = grid.querySelectorAll('label');
+            const selectedVal = input.value;
+            const correctVal = block.dataset.correct;
+
+            grid.classList.add('disabled-labels');
+
+            labels.forEach(label => {
+                const radio = label.querySelector('input');
+                if (radio.value === correctVal) {
+                    label.classList.add('option-correct');
+                }
+                if (radio.value === selectedVal && selectedVal !== correctVal) {
+                    label.classList.add('option-incorrect');
+                }
+            });
+
+            if (selectedVal === correctVal) {
+                playCorrect();
+            } else {
+                playWrong();
+            }
+        }
+
+        function resetSection(sectionId) {
+            const blocks = document.querySelectorAll(`.q-block[data-section="${sectionId}"]`);
+            blocks.forEach(block => {
+                const grid = block.querySelector('.options-grid');
+                grid.classList.remove('disabled-labels');
+                const labels = grid.querySelectorAll('label');
+                labels.forEach(l => {
+                    l.classList.remove('option-correct', 'option-incorrect');
+                    l.querySelector('input').checked = false;
+                });
+            });
+        }
+
+        function calculateScore() {
+            let score = 0;
+            const blocks = document.querySelectorAll('.q-block');
+            blocks.forEach(block => {
+                const checked = block.querySelector('input:checked');
+                if (checked && checked.value === block.dataset.correct) {
+                    score++;
+                }
+            });
+            document.getElementById('total-score').textContent = score;
+            document.getElementById('final-result').classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = renderQuiz;
+    </script>
+</body>
+</html>
